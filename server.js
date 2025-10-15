@@ -31,6 +31,10 @@ app.use(express.json({limit:"10mb"})); // allow json data to be sent in the requ
 app.use(cookieParser());
 
  // allow json data to be sent in the request body
+ app.get("/", (req, res) => {
+  res.send("Express is working!");
+});
+
 app.use("/api/auth", authRouters);
 app.use("/api/products",productRouters);
 app.use("/api/cart",cartRouters);
