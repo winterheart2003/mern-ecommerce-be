@@ -1,6 +1,8 @@
 import Product from '../models/product.model.js';
 
 export const getCartProducts = async (req, res) => {
+    console.log("accessToken", req.cookies.accessToken); // Debug: Log the access token
+    console.log("refreshToken", req.cookies.refreshToken); // Debug: Log the refresh token
 	try {
 		const products = await Product.find({ _id: { $in: req.user.cartItems } });
 

@@ -6,7 +6,6 @@ const generateToken = (userId)=>{
     const accessToken = jwt.sign({userId},process.env.ACCESS_TOKEN_SECRET,{
         expiresIn:"15m"
     });
-
     const refreshToken = jwt.sign({userId},process.env.REFRESH_TOKEN_SECRET,{
         expiresIn:"7d"
     });
@@ -31,6 +30,8 @@ const setCookies = (res,accessToken,refreshToken)=>{
     sameSite:"strict", // chặn csrf cross-site request forgery
     maxAge:7*24*60*60*1000, // 7days
 })
+
+console.log("cookies",req.cookies) // Debug: Log the cookies being set
 }
 export const signup = async(req,res)=>{
     const {email,password,name} = req.body
@@ -44,7 +45,8 @@ try{
    const user = await User.create({email,password,name})
 
    // authenticate 
-   const {accessToken,refreshToken} = generateToken(user._id)
+   const {accessToken,refreshToken} = await generateToken(user._id)
+   console.log("Generated Tokens:", { accessToken, refreshToken }); // Debug: Log the generated tokens
    await StoreRefreshToken(user._id,refreshToken)
 
    setCookies(res,accessToken,refreshToken)
@@ -69,33 +71,33 @@ catch(error){
 
  }
 
-export const login = async(req,res)=>{
-    try{
-        const {email,password} = req.body;
-        const user = await User.findOne({email})
-        if(user && (await user.comparePassword(password))){
-            const {accessToken, refreshToken} = generateToken(user._id);
-
-            await StoreRefreshToken(user._id,refreshToken)
-            setCookies(res,accessToken,refreshToken);
+    export const login = async(req,res)=>{
+        try{
+            const {email,password} = req.body;
+            const user = await User.findOne({email})
+            if(user && (await user.comparePassword(password))){
+                const {accessToken, refreshToken} = await generateToken(user._id);
+                console.log("Generated Tokens: login", { accessToken, refreshToken }); // Debug: Log the generated tokens
+                await StoreRefreshToken(user._id,refreshToken)
+                setCookies(res,accessToken,refreshToken);
+                
+                res.status(200).json({
+                    _id:user._id,
+                    name:user.name,
+                    email:user.email,
+                    role:user.role,
+                });
+            }
+            else{
+                res.status(401).json({message:"Email hoặc mật khẩu không hợp lệ"});
+            }
+        }
+        catch(error){
+            console.log("Error in login controller",error.message);
+            res.status(500).json({message:error.message});
             
-            res.status(200).json({
-                _id:user._id,
-                name:user.name,
-                email:user.email,
-                role:user.role,
-            });
-        }
-        else{
-            res.status(401).json({message:"Email hoặc mật khẩu không hợp lệ"});
         }
     }
-    catch(error){
-        console.log("Error in login controller",error.message);
-        res.status(500).json({message:error.message});
-        
-    }
-}
 
 export const logout = async(req,res)=>{
     try{
