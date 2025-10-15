@@ -8,7 +8,7 @@ import couponRouters from "./routes/coupon.route.js";
 import paymentRouters from "./routes/payment.route.js";
 import analyticsRoutes from "./routes/analytics.route.js";
 import cookieParser from 'cookie-parser';
-import { connectDB } from "../backend/lib/db.js";
+import { connectDB } from "./lib/db.js";
 
 dotenv.config()
 
