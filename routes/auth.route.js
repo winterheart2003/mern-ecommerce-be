@@ -3,7 +3,10 @@ import {signup,login,logout,refreshToken,getProfile} from "../controllers/auth.c
 import {protectRoute} from "../middleware/auth.middleware.js";
 
 const router = express.Router();
-
+router.get("/",(req,res)=>{
+    console.log("Request nhận được: ..", req.method, req.cookies);
+    res.send("Auth route is working")
+})
 router.post("/signup",signup)
 router.post("/login",login)
 router.post("/logout",logout)

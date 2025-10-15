@@ -46,7 +46,7 @@ try{
 
    // authenticate 
    const {accessToken,refreshToken} = await generateToken(user._id)
-   console.log("Generated Tokens:", { accessToken, refreshToken }); // Debug: Log the generated tokens
+
    await StoreRefreshToken(user._id,refreshToken)
 
    setCookies(res,accessToken,refreshToken)
@@ -71,7 +71,7 @@ catch(error){
 
  }
 
-    export const login = async(req,res)=>{
+export const login = async(req, res)=>{
         try{
             const {email,password} = req.body;
             const user = await User.findOne({email})
